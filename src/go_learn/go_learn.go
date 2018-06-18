@@ -11,5 +11,7 @@ import (
 func main() {
     fmt.Println("----------------------")
 
-    chapters.Channel_test()
+    //chapters.Channel_test()
+    chapters.Json_Marshall()
+    chapters.Json_Unmarshall()
 }
