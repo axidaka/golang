@@ -2,7 +2,6 @@ package chapters
 
 import (
 	"fmt"
-	"strings"
 )
 
 // go通过匿名组合的方式实现继承
@@ -111,8 +110,6 @@ func Interface_test()  {
 	fmt.Println(&file1, &file2, &file3, &file4, &file5)
 
 	MyPrintln(1, "2222", 1.2)
-
-	strings.Split()
 }
 
 /////////////////////////////////

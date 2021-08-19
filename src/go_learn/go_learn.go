@@ -21,6 +21,6 @@ func main() {
     //chapters.Channel_test()
     //chapters.Json_Marshall()
     //chapters.Json_Unmarshall()
-    chapters.Interface_test()
-
+    //chapters.Interface_test()
+    chapters.Channel_test()
 }
