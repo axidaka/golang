@@ -1,26 +1,22 @@
 package main
 
-
 //导入fmt包
 import (
-    "fmt"
-    "golang/src/go_learn/chapters"
+	"fmt"
+	"golang/src/go_learn/chapters"
 )
 
 type Rect struct {
-    x, y float64
-    width, height float64
+	x, y          float64
+	width, height float64
 }
+
 func NewRect(x, y, width, height float64) *Rect {
-    return &Rect{x, y, width, height}
+	return &Rect{x, y, width, height}
 }
 
 //main函数定义
 func main() {
-    fmt.Println("----------------------")
-    //chapters.Channel_test()
-    //chapters.Json_Marshall()
-    //chapters.Json_Unmarshall()
-    //chapters.Interface_test()
-    chapters.Channel_test()
+	fmt.Println("----------------------")
+	chapters.Channel_test()
 }
