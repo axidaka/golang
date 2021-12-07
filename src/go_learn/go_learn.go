@@ -4,7 +4,7 @@ package main
 //导入fmt包
 import (
     "fmt"
-    "go_learn/chapters"
+    "golang/src/go_learn/chapters"
 )
 
 type Rect struct {
