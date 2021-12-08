@@ -18,5 +18,5 @@ func NewRect(x, y, width, height float64) *Rect {
 //main函数定义
 func main() {
 	fmt.Println("----------------------")
-	chapters.Channel_test()
+	chapters.AddressBook_test()
 }
