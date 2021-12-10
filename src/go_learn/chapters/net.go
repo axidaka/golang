@@ -1,20 +1,23 @@
 package chapters
 
 import (
-	"net/rpc"
-	"net/http"
-	"net"
-	"os"
-	"io"
 	"bytes"
+	"context"
 	"fmt"
+	pb "golang/src/go_learn/protocolbuf/go"
+	"google.golang.org/grpc"
+	"io"
+	"net"
+	"net/http"
+	"net/rpc"
+	"os"
 )
 
 func checkSum(msg []byte) uint16 {
 
 	sum := 0
 	// 先假设为偶数
-	for n := 1; n <len(msg)-1; n += 2 {
+	for n := 1; n < len(msg)-1; n += 2 {
 		sum += int(msg[n])*256 + int(msg[n+1])
 	}
 	sum = (sum >> 16) + (sum & 0xffff)
@@ -30,7 +33,7 @@ func checkError(err error) {
 	}
 }
 
-func readFully(conn net.Conn)([]byte, error) {
+func readFully(conn net.Conn) ([]byte, error) {
 
 	defer conn.Close()
 
@@ -52,7 +55,7 @@ func readFully(conn net.Conn)([]byte, error) {
 	return result.Bytes(), nil
 }
 
-func Icmp_test(){
+func Icmp_test() {
 	if len(os.Args) != 2 {
 		fmt.Println("USAGE: ", os.Args[0], "host")
 		os.Exit(1)
@@ -64,13 +67,13 @@ func Icmp_test(){
 	checkError(err)
 
 	var msg [512]byte
-	msg[0] = 8 // echo
-	msg[1] = 0 // code 0
-	msg[2] = 0 // checksum
-	msg[3] = 0 // checksum
-	msg[4] = 0 // identifier[0]
+	msg[0] = 8  // echo
+	msg[1] = 0  // code 0
+	msg[2] = 0  // checksum
+	msg[3] = 0  // checksum
+	msg[4] = 0  // identifier[0]
 	msg[5] = 13 //identifier[1]
-	msg[6] = 0 // sequence[0]
+	msg[6] = 0  // sequence[0]
 	msg[7] = 37 // sequence[1]
 	len := 8
 
@@ -95,7 +98,7 @@ func Icmp_test(){
 	os.Exit(0)
 }
 
-func Tcp_test(){
+func Tcp_test() {
 	if len(os.Args) != 2 {
 		fmt.Println("USAGE: ", os.Args[0], "host")
 		os.Exit(1)
@@ -126,7 +129,6 @@ func Http_test() {
 	io.Copy(os.Stdout, resp.Body)
 }
 
-
 //rpc
 type Args struct {
 	A, B int
@@ -135,7 +137,7 @@ type Args struct {
 type Arith int
 
 func (t *Arith) Multiply(args *Args, reply *int) error {
-	*reply =args.A * args.B
+	*reply = args.A * args.B
 	return nil
 }
 
@@ -162,4 +164,43 @@ func Rpc_Client_test() {
 	checkError(err)
 
 	fmt.Println("Arith:%d * %d = %d", args.A, args.B, reply)
+}
+
+type HelloServiceImpl struct {
+}
+
+func (h *HelloServiceImpl) Hello(ctx context.Context, args *pb.String) (*pb.String, error) {
+	reply := &pb.String{Value: "hello " + args.GetValue()}
+	fmt.Println("req:", args.GetValue(), "  reply:", reply)
+	return reply, nil
+}
+
+func GRpc_Servce_test() {
+	grpcServer := grpc.NewServer()
+	pb.RegisterHelloServiceServer(grpcServer, new(HelloServiceImpl))
+
+	lis, err := net.Listen("tcp", ":1234")
+	if err != nil {
+		fmt.Println("listen err")
+	} else {
+		grpcServer.Serve(lis)
+	}
+}
+
+func GRpc_Client_test() {
+	conn, err := grpc.Dial("localhost:1234", grpc.WithInsecure())
+	if err != nil {
+		fmt.Println("conn err", err)
+		return
+	}
+
+	defer conn.Close()
+
+	client := pb.NewHelloServiceClient(conn)
+	reply, err := client.Hello(context.Background(), &pb.String{Value: "hello world"})
+	if err != nil {
+		fmt.Println("Hello err", err)
+		return
+	}
+	fmt.Println("Hello reply:", reply.GetValue())
 }
